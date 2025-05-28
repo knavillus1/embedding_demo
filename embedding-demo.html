@@ -36,8 +36,10 @@
       color: #555;
     }
     
-    #textInput {
-      width: 600px;
+    /* Textarea styling for both sections */
+    .input-section textarea {
+      width: 100%;
+      max-width: 600px;
       height: 200px;
       padding: 10px;
       border: 2px solid #ddd;
@@ -46,52 +48,35 @@
       resize: vertical;
       font-family: inherit;
     }
-    
-    .button-section {
-      margin: 20px 0;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-    
-    button {
-      padding: 12px 24px;
-      font-size: 16px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    
-    #embedButton {
+
+    /* Embed and Settings buttons styling for both sections */
+    #embedButtonProto,
+    #embedButtonTest {
       background-color: #4CAF50;
       color: white;
     }
-    
-    #embedButton:hover {
+    #embedButtonProto:hover,
+    #embedButtonTest:hover {
       background-color: #45a049;
     }
-    
-    #embedButton:disabled {
+    #embedButtonProto:disabled,
+    #embedButtonTest:disabled {
       background-color: #cccccc;
       cursor: not-allowed;
     }
-    
-    #settingsButton {
+    #settingsButtonProto,
+    #settingsButtonTest {
       background-color: #2196F3;
       color: white;
     }
-    
-    #settingsButton:hover {
+    #settingsButtonProto:hover,
+    #settingsButtonTest:hover {
       background-color: #1976D2;
     }
-    
-    .visualization-section {
-      margin-top: 30px;
-      text-align: center;
-    }
-    
-    #embeddingCanvas {
+
+    /* Embedding canvas styling for both sections */
+    #embeddingCanvasProto,
+    #embeddingCanvasTest {
       border: 2px solid #ddd;
       border-radius: 5px;
       margin: 20px 0;
@@ -104,8 +89,8 @@
       cursor: pointer;
       transition: border-color 0.3s;
     }
-    
-    #embeddingCanvas:hover {
+    #embeddingCanvasProto:hover,
+    #embeddingCanvasTest:hover {
       border-color: #4CAF50;
     }
     
@@ -145,7 +130,16 @@
       height: 100%;
       background-color: rgba(0,0,0,0.5);
     }
-    
+
+    /* Two-column layout */
+    .columns {
+      display: flex;
+      gap: 20px;
+    }
+    .col {
+      flex: 1;
+    }
+
     .modal-content {
       background-color: white;
       margin: 15% auto;
@@ -208,25 +202,64 @@
   <div class="container">
     <h1>OpenAI Embeddings Visualizer</h1>
     
-    <div class="input-section">
-      <label for="textInput">Enter text to embed:</label>
-      <textarea id="textInput" placeholder="Type your text here..."></textarea>
-    </div>
-    
-    <div class="button-section">
-      <button id="embedButton">Embed</button>
-      <button id="settingsButton">Settings</button>
-    </div>
-    
-    <div id="status" class="status"></div>
-    
-    <div class="visualization-section">
-      <h3>Embedding Visualization (32×48 pixels = 1536 dimensions)</h3>
-      <canvas id="embeddingCanvas" width="32" height="48"></canvas>
-      <div class="embedding-info">
-        Each pixel represents one dimension of the embedding vector.<br>
-        Brightness corresponds to the value (-1 to 1 range).<br>
-        <strong>Click the image to copy CSV data to clipboard.</strong>
+    <div class="columns">
+      <!-- Basis Transform Column -->
+      <div class="col" id="basis-transform">
+        <h2>Basis Transform</h2>
+        <div class="input-section">
+          <label for="basisImageUpload">Upload an image (32×48 grayscale basis):</label>
+          <input type="file" id="basisImageUpload" accept="image/*">
+        </div>
+        <div class="visualization-section">
+          <h3>Basis Grayscale (32×48 pixels)</h3>
+          <canvas id="basisCanvas" width="160" height="240" style="border:2px solid #ddd; border-radius:5px; background:white; image-rendering:pixelated; width:160px; height:240px;"></canvas>
+          <div class="embedding-info" id="basisInfo">
+            The uploaded image will be resized and converted to a 32×48 grayscale vector.<br>
+            This vector will be used as a basis for future transforms.
+          </div>
+        </div>
+      </div>
+      <div class="col" id="prototype">
+        <h2>Prototype</h2>
+        <div class="input-section">
+          <label for="textInputProto">Enter text to embed:</label>
+          <textarea id="textInputProto" placeholder="Type your text here..."></textarea>
+        </div>
+        <div class="button-section">
+          <button id="embedButtonProto">Embed</button>
+          <button id="settingsButtonProto">Settings</button>
+        </div>
+        <div id="statusProto" class="status"></div>
+        <div class="visualization-section">
+          <h3>Embedding Visualization (32×48 pixels)</h3>
+          <canvas id="embeddingCanvasProto" width="32" height="48"></canvas>
+          <div class="embedding-info" id="embeddingInfoProto">
+            Each pixel represents one dimension of the embedding vector.<br>
+            Brightness corresponds to the value (-1 to 1 range).<br>
+            <strong>Click the image to copy CSV data to clipboard.</strong>
+          </div>
+        </div>
+      </div>
+      <div class="col" id="test">
+        <h2>Test</h2>
+        <div class="input-section">
+          <label for="textInputTest">Enter text to embed:</label>
+          <textarea id="textInputTest" placeholder="Type your text here..."></textarea>
+        </div>
+        <div class="button-section">
+          <button id="embedButtonTest">Embed</button>
+          <button id="settingsButtonTest">Settings</button>
+        </div>
+        <div id="statusTest" class="status"></div>
+        <div class="visualization-section">
+          <h3>Embedding Visualization (32×48 pixels)</h3>
+          <canvas id="embeddingCanvasTest" width="32" height="48"></canvas>
+          <div class="embedding-info" id="embeddingInfoTest">
+            Each pixel represents one dimension of the embedding vector.<br>
+            Brightness corresponds to the value (-1 to 1 range).<br>
+            <strong>Click the image to copy CSV data to clipboard.</strong>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -251,11 +284,28 @@
 
   <script>
     // DOM Elements
-    const textInput = document.getElementById('textInput');
-    const embedButton = document.getElementById('embedButton');
-    const settingsButton = document.getElementById('settingsButton');
-    const statusDiv = document.getElementById('status');
-    const canvas = document.getElementById('embeddingCanvas');
+    // Prototype section elements
+    const textInputProto = document.getElementById('textInputProto');
+    const embedButtonProto = document.getElementById('embedButtonProto');
+    const settingsButtonProto = document.getElementById('settingsButtonProto');
+    const statusProto = document.getElementById('statusProto');
+    const canvasProto = document.getElementById('embeddingCanvasProto');
+    const ctxProto = canvasProto.getContext('2d');
+
+    // Test section elements
+    const textInputTest = document.getElementById('textInputTest');
+    const embedButtonTest = document.getElementById('embedButtonTest');
+    const settingsButtonTest = document.getElementById('settingsButtonTest');
+    const statusTest = document.getElementById('statusTest');
+    const canvasTest = document.getElementById('embeddingCanvasTest');
+    const ctxTest = canvasTest.getContext('2d');
+
+    // Basis Transform elements
+    const basisImageUpload = document.getElementById('basisImageUpload');
+    const basisCanvas = document.getElementById('basisCanvas');
+    const ctxBasis = basisCanvas.getContext('2d');
+    const basisInfo = document.getElementById('basisInfo');
+
     const modal = document.getElementById('settingsModal');
     const apiKeyInput = document.getElementById('apiKeyInput');
     const saveButton = document.getElementById('saveButton');
@@ -265,14 +315,15 @@
     // Store the current embedding data
     let currentEmbedding = null;
     let currentNormalizedValues = null;
+    let currentEmbeddingTest = null;
+    let currentNormalizedValuesTest = null;
 
     // Initialize canvas
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#f0f0f0';
-    ctx.fillRect(0, 0, 32, 48);
+    ctxProto.fillStyle = '#f0f0f0';
+    ctxProto.fillRect(0, 0, 32, 48);
 
     // Modal functionality
-    settingsButton.addEventListener('click', () => {
+    settingsButtonProto.addEventListener('click', () => {
       const existingKey = localStorage.getItem('OPENAI_API_KEY');
       if (existingKey) {
         apiKeyInput.value = existingKey;
@@ -292,9 +343,9 @@
       const apiKey = apiKeyInput.value.trim();
       if (apiKey) {
         localStorage.setItem('OPENAI_API_KEY', apiKey);
-        showStatus('API key saved successfully!', 'success');
+        showStatus(statusProto, 'API key saved successfully!', 'success');
       } else {
-        showStatus('Please enter a valid API key', 'error');
+        showStatus(statusProto, 'Please enter a valid API key', 'error');
         return;
       }
       modal.style.display = 'none';
@@ -306,15 +357,14 @@
       }
     });
 
-    // Status display function
-    function showStatus(message, type) {
-      statusDiv.textContent = message;
-      statusDiv.className = `status ${type}`;
-      statusDiv.style.display = 'block';
-      
+    // Status display function for a given section
+    function showStatus(statusEl, message, type) {
+      statusEl.textContent = message;
+      statusEl.className = `status ${type}`;
+      statusEl.style.display = 'block';
       if (type !== 'loading') {
         setTimeout(() => {
-          statusDiv.style.display = 'none';
+          statusEl.style.display = 'none';
         }, 3000);
       }
     }
@@ -373,19 +423,27 @@
     }
 
     function renderEmbeddingToCanvas(embedding, width, height) {
-      canvas.width = width;
-      canvas.height = height;
-      const imageData = ctx.createImageData(width, height);
+      canvasProto.width = width;
+      canvasProto.height = height;
+      const imageData = ctxProto.createImageData(width, height);
       const data = imageData.data;
 
       // Calculate and store normalized values
       const normalizedValues = [];
 
-      for (let i = 0; i < embedding.length && i < width * height; i++) {
-        const normalizedValue = mapValueToNormalized(embedding[i]);
+      // Apply basis reordering if mapping exists
+      let embeddingToRender = embedding;
+      if (basisOrderMapping && embedding.length === basisOrderMapping.length) {
+        const result = reorderPrototypeByBasis(embedding, basisOrderMapping);
+        embeddingToRender = result.reordered;
+        prototypeReorderingIndices = result.indices; // Store for test to use
+      }
+
+      for (let i = 0; i < embeddingToRender.length && i < width * height; i++) {
+        const normalizedValue = mapValueToNormalized(embeddingToRender[i]);
         normalizedValues.push(normalizedValue);
         
-        const [r, g, b] = mapValueToGrayscaleRGB(embedding[i]);
+        const [r, g, b] = mapValueToGrayscaleRGB(embeddingToRender[i]);
         const pixelIndex = i * 4;
         data[pixelIndex] = r;     // Red
         data[pixelIndex + 1] = g; // Green
@@ -396,7 +454,35 @@
       // Store normalized values in page data model
       currentNormalizedValues = normalizedValues;
 
-      ctx.putImageData(imageData, 0, 0);
+      ctxProto.putImageData(imageData, 0, 0);
+    }
+
+    // Test section rendering function
+    function renderEmbeddingToCanvasTest(embedding, width, height) {
+      canvasTest.width = width;
+      canvasTest.height = height;
+      const imageData = ctxTest.createImageData(width, height);
+      const data = imageData.data;
+      const normalizedValues = [];
+
+      // Apply the EXACT SAME reordering indices as the prototype
+      let embeddingToRender = embedding;
+      if (prototypeReorderingIndices && embedding.length === prototypeReorderingIndices.length) {
+        embeddingToRender = reorderTestUsingPrototypeIndices(embedding, prototypeReorderingIndices);
+      }
+
+      for (let i = 0; i < embeddingToRender.length && i < width * height; i++) {
+        const normalizedValue = mapValueToNormalized(embeddingToRender[i]);
+        normalizedValues.push(normalizedValue);
+        const [r, g, b] = mapValueToGrayscaleRGB(embeddingToRender[i]);
+        const idx = i * 4;
+        data[idx] = r;
+        data[idx + 1] = g;
+        data[idx + 2] = b;
+        data[idx + 3] = 255;
+      }
+      currentNormalizedValuesTest = normalizedValues;
+      ctxTest.putImageData(imageData, 0, 0);
     }
 
     // CSV export functionality
@@ -446,53 +532,217 @@
       }
     }
 
-    // Canvas click handler for CSV export
-    canvas.addEventListener('click', async () => {
-      if (!currentEmbedding) {
-        showStatus('No embedding data available. Please generate an embedding first.', 'error');
-        return;
+    // Event handlers for test section
+    settingsButtonTest.addEventListener('click', () => {
+      const existingKey = localStorage.getItem('OPENAI_API_KEY');
+      if (existingKey) apiKeyInput.value = existingKey;
+      modal.style.display = 'block';
+    });
+    
+    embedButtonTest.addEventListener('click', async () => {
+      const text = textInputTest.value.trim();
+      if (!text) return showStatus(statusTest, 'Please enter some text to embed', 'error');
+      embedButtonTest.disabled = true;
+      showStatus(statusTest, 'Generating embedding...', 'loading');
+      try {
+        const embedding = await getEmbedding(text);
+        renderEmbeddingToCanvasTest(embedding, 32, 48);
+        currentEmbeddingTest = embedding;
+        showStatus(statusTest, `Embedding generated successfully! (${embedding.length} dimensions)`, 'success');
+      } catch (error) {
+        showStatus(statusTest, error.message, 'error');
+        console.error('Embedding error:', error);
+      } finally {
+        embedButtonTest.disabled = false;
       }
+    });
+    
+    canvasTest.addEventListener('click', async () => {
+      if (!currentEmbeddingTest) return showStatus(statusTest, 'No embedding data available. Please generate an embedding first.', 'error');
+      const csvData = embeddingToCSV(currentEmbeddingTest);
+      const success = await copyToClipboard(csvData);
+      showStatus(statusTest, success ? 'CSV data copied to clipboard!' : 'Failed to copy to clipboard. Please try again.', success ? 'success' : 'error');
+    });
+
+    // Canvas click handler for CSV export (prototype)
+    canvasProto.addEventListener('click', async () => {
+      if (!currentEmbedding) return showStatus(statusProto, 'No embedding data available. Please generate an embedding first.', 'error');
 
       const csvData = embeddingToCSV(currentEmbedding);
       const success = await copyToClipboard(csvData);
-      
-      if (success) {
-        showStatus('CSV data copied to clipboard!', 'success');
-      } else {
-        showStatus('Failed to copy to clipboard. Please try again.', 'error');
-      }
+      showStatus(statusProto, success ? 'CSV data copied to clipboard!' : 'Failed to copy to clipboard. Please try again.', success ? 'success' : 'error');
     });
 
-    // Embed button functionality
-    embedButton.addEventListener('click', async () => {
-      const text = textInput.value.trim();
-      if (!text) {
-        showStatus('Please enter some text to embed', 'error');
-        return;
-      }
+    // Embed button functionality (prototype)
+    embedButtonProto.addEventListener('click', async () => {
+      const text = textInputProto.value.trim();
+      if (!text) return showStatus(statusProto, 'Please enter some text to embed', 'error');
 
-      embedButton.disabled = true;
-      showStatus('Generating embedding...', 'loading');
+      embedButtonProto.disabled = true;
+      showStatus(statusProto, 'Generating embedding...', 'loading');
 
       try {
         const embedding = await getEmbedding(text);
         renderEmbeddingToCanvas(embedding, 32, 48);
-        currentEmbedding = embedding; // Store the current embedding
-        showStatus(`Embedding generated successfully! (${embedding.length} dimensions)`, 'success');
+        currentEmbedding = embedding;
+        showStatus(statusProto, `Embedding generated successfully! (${embedding.length} dimensions)`, 'success');
       } catch (error) {
-        showStatus(error.message, 'error');
+        showStatus(statusProto, error.message, 'error');
         console.error('Embedding error:', error);
       } finally {
-        embedButton.disabled = false;
+        embedButtonProto.disabled = false;
       }
+    });
+
+    // Basis Transform functionality
+    // Use the same logic as image_test.html for 32x48 grayscale vector extraction
+    let basisGrayscaleVector = [];
+    let basisNormalizedGrayscaleVector = [];
+    let basisOrderMapping = null; // Stores the reordering indices
+    let prototypeReorderingIndices = null; // Stores the exact reordering used for prototype
+
+    // Function to create basis ordering mapping
+    function createBasisOrderMapping(basisVector) {
+      // Create array of {value, originalIndex} pairs
+      const indexedValues = basisVector.map((value, index) => ({
+        value: value,
+        originalIndex: index
+      }));
+      
+      // Sort by value (lightest to darkest)
+      indexedValues.sort((a, b) => a.value - b.value);
+      
+      // Create mapping: original position -> new position in sorted order
+      const mapping = new Array(basisVector.length);
+      indexedValues.forEach((item, newIndex) => {
+        mapping[item.originalIndex] = newIndex;
+      });
+      
+      return mapping;
+    }
+
+    // Function to reorder prototype vector based on basis mapping
+    function reorderPrototypeByBasis(vector, mapping) {
+      if (!mapping || mapping.length !== vector.length) return { reordered: vector, indices: null };
+      
+      // Create array of {value, originalIndex} pairs for the embedding vector
+      const indexedEmbedding = vector.map((value, index) => ({
+        value: value,
+        originalIndex: index
+      }));
+      
+      // Sort embedding values from smallest to largest (lightest to darkest)
+      indexedEmbedding.sort((a, b) => a.value - b.value);
+      
+      // Create the reordered vector and store the indices used
+      const reordered = new Array(vector.length);
+      const usedIndices = new Array(vector.length);
+      
+      // Map sorted embedding values to basis positions
+      // The brightest basis pixels get the lightest embedding values
+      for (let i = 0; i < vector.length; i++) {
+        // Find where this basis pixel ranks in brightness (0 = darkest basis pixel)
+        const basisRank = mapping[i];
+        // Get the embedding value that should go here (lightest embedding values go to brightest basis pixels)
+        const embeddingItem = indexedEmbedding[basisRank];
+        reordered[i] = embeddingItem.value;
+        usedIndices[i] = embeddingItem.originalIndex; // Store which original index was used
+      }
+      
+      return { reordered, indices: usedIndices };
+    }
+
+    // Function to reorder test vector using the same indices as prototype
+    function reorderTestUsingPrototypeIndices(vector, indices) {
+      if (!indices || indices.length !== vector.length) return vector;
+      
+      const reordered = new Array(vector.length);
+      for (let i = 0; i < vector.length; i++) {
+        reordered[i] = vector[indices[i]];
+      }
+      
+      return reordered;
+    }
+
+    basisImageUpload.addEventListener('change', async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      // 1) Load image
+      const img = new Image();
+      img.src = await new Promise(res => {
+        const fr = new FileReader();
+        fr.onload = () => res(fr.result);
+        fr.readAsDataURL(file);
+      });
+
+      img.onload = () => {
+        // 2) Draw into offscreen 32×48 canvas
+        const OFF_WIDTH = 32;
+        const OFF_HEIGHT = 48;
+        const off = document.createElement('canvas');
+        off.width = OFF_WIDTH;
+        off.height = OFF_HEIGHT;
+        const offCtx = off.getContext('2d');
+        offCtx.imageSmoothingEnabled = true;
+        offCtx.drawImage(img, 0, 0, off.width, off.height);
+
+        // 3) Grab the pixels, compute grayscale & vectors, AND overwrite to true gray
+        const imgData = offCtx.getImageData(0, 0, off.width, off.height);
+        const d = imgData.data;
+        basisGrayscaleVector = [];
+        basisNormalizedGrayscaleVector = [];
+
+        for (let i = 0; i < d.length; i += 4) {
+          // luminosity
+          const lum = 0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2];
+          const norm = lum / 255;
+          const grey = Math.round(norm * 255);
+
+          basisNormalizedGrayscaleVector.push(norm);
+          basisGrayscaleVector.push(grey);
+
+          // overwrite pixel to gray
+          d[i] = d[i+1] = d[i+2] = grey;
+          d[i+3] = 255;
+        }
+        offCtx.putImageData(imgData, 0, 0);
+
+        // 4) Create the basis ordering mapping
+        basisOrderMapping = createBasisOrderMapping(basisNormalizedGrayscaleVector);
+
+        // 5) Resize & draw the grayscaled offscreen full-canvas (5x scale)
+        ctxBasis.imageSmoothingEnabled = false;
+        ctxBasis.clearRect(0, 0, basisCanvas.width, basisCanvas.height);
+        ctxBasis.drawImage(
+          off,
+          0, 0, off.width, off.height,
+          0, 0, basisCanvas.width, basisCanvas.height
+        );
+
+        // 6) Re-render existing embeddings with basis ordering if they exist
+        if (currentEmbedding && currentNormalizedValues) {
+          renderEmbeddingToCanvas(currentEmbedding, 32, 48);
+        }
+        if (currentEmbeddingTest && currentNormalizedValuesTest) {
+          renderEmbeddingToCanvasTest(currentEmbeddingTest, 32, 48);
+        }
+
+        // 7) Expose for downstream embedding code
+        window.basisGrayscaleVector = basisGrayscaleVector;
+        window.basisNormalizedGrayscaleVector = basisNormalizedGrayscaleVector;
+        window.basisOrderMapping = basisOrderMapping;
+
+        console.log('basisGrayscaleVector:', basisGrayscaleVector);
+        console.log('basisNormalizedGrayscaleVector:', basisNormalizedGrayscaleVector);
+        console.log('basisOrderMapping:', basisOrderMapping);
+      };
     });
 
     // Check if API key exists on load
     window.addEventListener('load', () => {
       const apiKey = localStorage.getItem('OPENAI_API_KEY');
-      if (!apiKey) {
-        showStatus('Please set your OpenAI API key in Settings to get started', 'error');
-      }
+      if (!apiKey) showStatus(statusProto, 'Please set your OpenAI API key in Settings to get started', 'error');
     });
   </script>
 </body>
