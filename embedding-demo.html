@@ -64,13 +64,17 @@
       background-color: #cccccc;
       cursor: not-allowed;
     }
-    #settingsButtonProto,
-    #settingsButtonTest {
+    #settingsButtonGlobal {
       background-color: #2196F3;
       color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-bottom: 20px;
     }
-    #settingsButtonProto:hover,
-    #settingsButtonTest:hover {
+    #settingsButtonGlobal:hover {
       background-color: #1976D2;
     }
 
@@ -206,6 +210,9 @@
       <!-- Basis Transform Column -->
       <div class="col" id="basis-transform">
         <h2>Basis Transform</h2>
+        <div class="button-section">
+          <button id="settingsButtonGlobal">Settings</button>
+        </div>
         <div class="input-section">
           <label for="basisImageUpload">Upload an image (32×48 grayscale basis):</label>
           <input type="file" id="basisImageUpload" accept="image/*">
@@ -227,7 +234,6 @@
         </div>
         <div class="button-section">
           <button id="embedButtonProto">Embed</button>
-          <button id="settingsButtonProto">Settings</button>
         </div>
         <div id="statusProto" class="status"></div>
         <div class="visualization-section">
@@ -248,7 +254,6 @@
         </div>
         <div class="button-section">
           <button id="embedButtonTest">Embed</button>
-          <button id="settingsButtonTest">Settings</button>
         </div>
         <div id="statusTest" class="status"></div>
         <div class="visualization-section">
@@ -287,7 +292,6 @@
     // Prototype section elements
     const textInputProto = document.getElementById('textInputProto');
     const embedButtonProto = document.getElementById('embedButtonProto');
-    const settingsButtonProto = document.getElementById('settingsButtonProto');
     const statusProto = document.getElementById('statusProto');
     const canvasProto = document.getElementById('embeddingCanvasProto');
     const ctxProto = canvasProto.getContext('2d');
@@ -295,7 +299,6 @@
     // Test section elements
     const textInputTest = document.getElementById('textInputTest');
     const embedButtonTest = document.getElementById('embedButtonTest');
-    const settingsButtonTest = document.getElementById('settingsButtonTest');
     const statusTest = document.getElementById('statusTest');
     const canvasTest = document.getElementById('embeddingCanvasTest');
     const ctxTest = canvasTest.getContext('2d');
@@ -305,6 +308,7 @@
     const basisCanvas = document.getElementById('basisCanvas');
     const ctxBasis = basisCanvas.getContext('2d');
     const basisInfo = document.getElementById('basisInfo');
+    const settingsButtonGlobal = document.getElementById('settingsButtonGlobal');
 
     const modal = document.getElementById('settingsModal');
     const apiKeyInput = document.getElementById('apiKeyInput');
@@ -323,7 +327,7 @@
     ctxProto.fillRect(0, 0, 32, 48);
 
     // Modal functionality
-    settingsButtonProto.addEventListener('click', () => {
+    settingsButtonGlobal.addEventListener('click', () => {
       const existingKey = localStorage.getItem('OPENAI_API_KEY');
       if (existingKey) {
         apiKeyInput.value = existingKey;
@@ -467,7 +471,7 @@
       // Update transformation description
       document.getElementById('embeddingInfoProto').innerHTML = `
         Each pixel represents one dimension of the embedding vector.<br>
-        Brightness corresponds to the value (-1 to 1 range).<br>
+        Values are exponentially normalized (cube root) from the raw -1 to 1 range to enhance visual contrast.<br>
         <strong>Click the image to copy CSV data to clipboard.</strong><br>
         <em>Transform: ${transformDescription}</em>
       `;
@@ -506,7 +510,7 @@
       // Update transformation description
       document.getElementById('embeddingInfoTest').innerHTML = `
         Each pixel represents one dimension of the embedding vector.<br>
-        Brightness corresponds to the value (-1 to 1 range).<br>
+        Values are exponentially normalized (cube root) from the raw -1 to 1 range to enhance visual contrast.<br>
         <strong>Click the image to copy CSV data to clipboard.</strong><br>
         <em>Transform: ${transformDescription}</em>
       `;
@@ -560,12 +564,6 @@
     }
 
     // Event handlers for test section
-    settingsButtonTest.addEventListener('click', () => {
-      const existingKey = localStorage.getItem('OPENAI_API_KEY');
-      if (existingKey) apiKeyInput.value = existingKey;
-      modal.style.display = 'block';
-    });
-    
     embedButtonTest.addEventListener('click', async () => {
       const text = textInputTest.value.trim();
       if (!text) return showStatus(statusTest, 'Please enter some text to embed', 'error');
