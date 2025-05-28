@@ -192,11 +192,20 @@
       color: #666;
       margin-bottom: 15px;
     }
-    
-    .embedding-info {
+      .embedding-info {
       font-size: 14px;
       color: #666;
       margin-top: 10px;
+    }
+    
+    .similarity-display {
+      font-size: 14px;
+      color: #333;
+      margin-top: 10px;
+      padding: 8px;
+      background-color: #f8f9fa;
+      border-radius: 4px;
+      border-left: 4px solid #007bff;
     }
   </style>
 </head>
@@ -248,9 +257,9 @@
         <div class="input-section">
           <label for="textInputTest1">Enter text to embed:</label>
           <textarea id="textInputTest1" placeholder="Type your text here..."></textarea>
-        </div>
-        <div class="button-section">
+        </div>        <div class="button-section">
           <button id="embedButtonTest1">Embed</button>
+          <div class="similarity-display" id="similarityTest1" style="margin-top: 10px; font-size: 14px; color: #666;"></div>
         </div>
         <div id="statusTest1" class="status"></div>
         <div class="visualization-section">
@@ -268,9 +277,9 @@
         <div class="input-section">
           <label for="textInputTest2">Enter text to embed:</label>
           <textarea id="textInputTest2" placeholder="Type your text here..."></textarea>
-        </div>
-        <div class="button-section">
+        </div>        <div class="button-section">
           <button id="embedButtonTest2">Embed</button>
+          <div class="similarity-display" id="similarityTest2" style="margin-top: 10px; font-size: 14px; color: #666;"></div>
         </div>
         <div id="statusTest2" class="status"></div>
         <div class="visualization-section">
@@ -395,9 +404,7 @@
           statusEl.style.display = 'none';
         }, 3000);
       }
-    }
-
-    // Embedding functions
+    }    // Embedding functions
     async function getEmbedding(inputText) {
       const apiKey = localStorage.getItem('OPENAI_API_KEY');
       if (!apiKey) {
@@ -421,6 +428,45 @@
         throw new Error(`Embedding API error: ${result.error.message}`);
       }
       return result.data[0].embedding;
+    }
+
+    // Cosine similarity function
+    function cosineSimilarity(vecA, vecB) {
+      if (vecA.length !== vecB.length) {
+        throw new Error('Vectors must be the same length');
+      }
+
+      let dot = 0, normA = 0, normB = 0;
+      for (let i = 0; i < vecA.length; i++) {
+        const a = vecA[i];
+        const b = vecB[i];
+        dot   += a * b;
+        normA += a * a;
+        normB += b * b;
+      }
+      return dot / (Math.sqrt(normA) * Math.sqrt(normB)); // may be NaN if a norm is 0
+    }
+
+    // Function to update similarity display
+    function updateSimilarityDisplay(testEmbedding, testId) {
+      const similarityElement = document.getElementById(`similarity${testId}`);
+      
+      if (!currentEmbedding || !testEmbedding) {
+        similarityElement.textContent = '';
+        return;
+      }
+
+      try {
+        const similarity = cosineSimilarity(currentEmbedding, testEmbedding);
+        if (isNaN(similarity)) {
+          similarityElement.textContent = 'Similarity: N/A (zero vector)';
+        } else {
+          similarityElement.innerHTML = `<strong>Cosine Similarity:</strong> ${similarity.toFixed(4)}`;
+        }
+      } catch (error) {
+        similarityElement.textContent = 'Similarity: Error calculating';
+        console.error('Similarity calculation error:', error);
+      }
     }
 
     function mapValueToNormalized(value) {
@@ -634,6 +680,7 @@
         const embedding = await getEmbedding(text);
         renderEmbeddingToCanvasTest1(embedding, 32, 48);
         currentEmbeddingTest1 = embedding;
+        updateSimilarityDisplay(embedding, 'Test1');
         showStatus(statusTest1, `Embedding generated successfully! (${embedding.length} dimensions)`, 'success');
       } catch (error) {
         showStatus(statusTest1, error.message, 'error');
@@ -648,9 +695,7 @@
       const csvData = embeddingToCSV(currentEmbeddingTest1);
       const success = await copyToClipboard(csvData);
       showStatus(statusTest1, success ? 'CSV data copied to clipboard!' : 'Failed to copy to clipboard. Please try again.', success ? 'success' : 'error');
-    });
-
-    // Event handlers for test 2 section
+    });    // Event handlers for test 2 section
     embedButtonTest2.addEventListener('click', async () => {
       const text = textInputTest2.value.trim();
       if (!text) return showStatus(statusTest2, 'Please enter some text to embed', 'error');
@@ -660,6 +705,7 @@
         const embedding = await getEmbedding(text);
         renderEmbeddingToCanvasTest2(embedding, 32, 48);
         currentEmbeddingTest2 = embedding;
+        updateSimilarityDisplay(embedding, 'Test2');
         showStatus(statusTest2, `Embedding generated successfully! (${embedding.length} dimensions)`, 'success');
       } catch (error) {
         showStatus(statusTest2, error.message, 'error');
@@ -683,9 +729,7 @@
       const csvData = embeddingToCSV(currentEmbedding);
       const success = await copyToClipboard(csvData);
       showStatus(statusProto, success ? 'CSV data copied to clipboard!' : 'Failed to copy to clipboard. Please try again.', success ? 'success' : 'error');
-    });
-
-    // Embed button functionality (prototype)
+    });    // Embed button functionality (prototype)
     embedButtonProto.addEventListener('click', async () => {
       const text = textInputProto.value.trim();
       if (!text) return showStatus(statusProto, 'Please enter some text to embed', 'error');
@@ -697,6 +741,15 @@
         const embedding = await getEmbedding(text);
         renderEmbeddingToCanvas(embedding, 32, 48);
         currentEmbedding = embedding;
+        
+        // Update similarity displays for existing test embeddings
+        if (currentEmbeddingTest1) {
+          updateSimilarityDisplay(currentEmbeddingTest1, 'Test1');
+        }
+        if (currentEmbeddingTest2) {
+          updateSimilarityDisplay(currentEmbeddingTest2, 'Test2');
+        }
+        
         showStatus(statusProto, `Embedding generated successfully! (${embedding.length} dimensions)`, 'success');
       } catch (error) {
         showStatus(statusProto, error.message, 'error');
