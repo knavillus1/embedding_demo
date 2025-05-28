@@ -3,10 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <title>OpenAI Embeddings Visualizer</title>
-  <style>
-    body {
+  <style>    body {
       font-family: Arial, sans-serif;
-      max-width: 800px;
+      max-width: 1200px;
       margin: 0 auto;
       padding: 20px;
       background-color: #f5f5f5;
@@ -35,32 +34,32 @@
       font-weight: bold;
       color: #555;
     }
-    
-    /* Textarea styling for both sections */
+      /* Textarea styling for all sections */
     .input-section textarea {
       width: 100%;
-      max-width: 600px;
-      height: 200px;
+      max-width: 250px;
+      height: 150px;
       padding: 10px;
       border: 2px solid #ddd;
       border-radius: 5px;
       font-size: 14px;
       resize: vertical;
       font-family: inherit;
-    }
-
-    /* Embed and Settings buttons styling for both sections */
+    }/* Embed and Settings buttons styling for all sections */
     #embedButtonProto,
-    #embedButtonTest {
+    #embedButtonTest1,
+    #embedButtonTest2 {
       background-color: #4CAF50;
       color: white;
     }
     #embedButtonProto:hover,
-    #embedButtonTest:hover {
+    #embedButtonTest1:hover,
+    #embedButtonTest2:hover {
       background-color: #45a049;
     }
     #embedButtonProto:disabled,
-    #embedButtonTest:disabled {
+    #embedButtonTest1:disabled,
+    #embedButtonTest2:disabled {
       background-color: #cccccc;
       cursor: not-allowed;
     }
@@ -76,11 +75,10 @@
     }
     #settingsButtonGlobal:hover {
       background-color: #1976D2;
-    }
-
-    /* Embedding canvas styling for both sections */
+    }    /* Embedding canvas styling for all sections */
     #embeddingCanvasProto,
-    #embeddingCanvasTest {
+    #embeddingCanvasTest1,
+    #embeddingCanvasTest2 {
       border: 2px solid #ddd;
       border-radius: 5px;
       margin: 20px 0;
@@ -94,7 +92,8 @@
       transition: border-color 0.3s;
     }
     #embeddingCanvasProto:hover,
-    #embeddingCanvasTest:hover {
+    #embeddingCanvasTest1:hover,
+    #embeddingCanvasTest2:hover {
       border-color: #4CAF50;
     }
     
@@ -133,15 +132,14 @@
       width: 100%;
       height: 100%;
       background-color: rgba(0,0,0,0.5);
-    }
-
-    /* Two-column layout */
+    }    /* Four-column layout */
     .columns {
       display: flex;
-      gap: 20px;
+      gap: 15px;
     }
     .col {
       flex: 1;
+      min-width: 0; /* Allows flex items to shrink below their content size */
     }
 
     .modal-content {
@@ -245,21 +243,40 @@
             <strong>Click the image to copy CSV data to clipboard.</strong>
           </div>
         </div>
-      </div>
-      <div class="col" id="test">
-        <h2>Test</h2>
+      </div>      <div class="col" id="test1">
+        <h2>Test 1</h2>
         <div class="input-section">
-          <label for="textInputTest">Enter text to embed:</label>
-          <textarea id="textInputTest" placeholder="Type your text here..."></textarea>
+          <label for="textInputTest1">Enter text to embed:</label>
+          <textarea id="textInputTest1" placeholder="Type your text here..."></textarea>
         </div>
         <div class="button-section">
-          <button id="embedButtonTest">Embed</button>
+          <button id="embedButtonTest1">Embed</button>
         </div>
-        <div id="statusTest" class="status"></div>
+        <div id="statusTest1" class="status"></div>
         <div class="visualization-section">
           <h3>Embedding Visualization (32×48 pixels)</h3>
-          <canvas id="embeddingCanvasTest" width="32" height="48"></canvas>
-          <div class="embedding-info" id="embeddingInfoTest">
+          <canvas id="embeddingCanvasTest1" width="32" height="48"></canvas>
+          <div class="embedding-info" id="embeddingInfoTest1">
+            Each pixel represents one dimension of the embedding vector.<br>
+            Brightness corresponds to the value (-1 to 1 range).<br>
+            <strong>Click the image to copy CSV data to clipboard.</strong>
+          </div>
+        </div>
+      </div>
+      <div class="col" id="test2">
+        <h2>Test 2</h2>
+        <div class="input-section">
+          <label for="textInputTest2">Enter text to embed:</label>
+          <textarea id="textInputTest2" placeholder="Type your text here..."></textarea>
+        </div>
+        <div class="button-section">
+          <button id="embedButtonTest2">Embed</button>
+        </div>
+        <div id="statusTest2" class="status"></div>
+        <div class="visualization-section">
+          <h3>Embedding Visualization (32×48 pixels)</h3>
+          <canvas id="embeddingCanvasTest2" width="32" height="48"></canvas>
+          <div class="embedding-info" id="embeddingInfoTest2">
             Each pixel represents one dimension of the embedding vector.<br>
             Brightness corresponds to the value (-1 to 1 range).<br>
             <strong>Click the image to copy CSV data to clipboard.</strong>
@@ -294,14 +311,19 @@
     const embedButtonProto = document.getElementById('embedButtonProto');
     const statusProto = document.getElementById('statusProto');
     const canvasProto = document.getElementById('embeddingCanvasProto');
-    const ctxProto = canvasProto.getContext('2d');
+    const ctxProto = canvasProto.getContext('2d');    // Test 1 section elements
+    const textInputTest1 = document.getElementById('textInputTest1');
+    const embedButtonTest1 = document.getElementById('embedButtonTest1');
+    const statusTest1 = document.getElementById('statusTest1');
+    const canvasTest1 = document.getElementById('embeddingCanvasTest1');
+    const ctxTest1 = canvasTest1.getContext('2d');
 
-    // Test section elements
-    const textInputTest = document.getElementById('textInputTest');
-    const embedButtonTest = document.getElementById('embedButtonTest');
-    const statusTest = document.getElementById('statusTest');
-    const canvasTest = document.getElementById('embeddingCanvasTest');
-    const ctxTest = canvasTest.getContext('2d');
+    // Test 2 section elements
+    const textInputTest2 = document.getElementById('textInputTest2');
+    const embedButtonTest2 = document.getElementById('embedButtonTest2');
+    const statusTest2 = document.getElementById('statusTest2');
+    const canvasTest2 = document.getElementById('embeddingCanvasTest2');
+    const ctxTest2 = canvasTest2.getContext('2d');
 
     // Basis Transform elements
     const basisImageUpload = document.getElementById('basisImageUpload');
@@ -314,17 +336,19 @@
     const apiKeyInput = document.getElementById('apiKeyInput');
     const saveButton = document.getElementById('saveButton');
     const cancelButton = document.getElementById('cancelButton');
-    const closeButton = document.querySelector('.close');
-
-    // Store the current embedding data
+    const closeButton = document.querySelector('.close');    // Store the current embedding data
     let currentEmbedding = null;
     let currentNormalizedValues = null;
-    let currentEmbeddingTest = null;
-    let currentNormalizedValuesTest = null;
-
-    // Initialize canvas
+    let currentEmbeddingTest1 = null;
+    let currentNormalizedValuesTest1 = null;
+    let currentEmbeddingTest2 = null;
+    let currentNormalizedValuesTest2 = null;    // Initialize canvases
     ctxProto.fillStyle = '#f0f0f0';
     ctxProto.fillRect(0, 0, 32, 48);
+    ctxTest1.fillStyle = '#f0f0f0';
+    ctxTest1.fillRect(0, 0, 32, 48);
+    ctxTest2.fillStyle = '#f0f0f0';
+    ctxTest2.fillRect(0, 0, 32, 48);
 
     // Modal functionality
     settingsButtonGlobal.addEventListener('click', () => {
@@ -444,10 +468,12 @@
         embeddingToRender = result.reordered;
         prototypeReorderingIndices = result.indices; // Store for test to use
         transformDescription = "Vector reordered to recreate basis image structure. Lightest embedding values mapped to brightest basis pixels.";
-        
-        // Retrigger test remapping if test embedding exists
-        if (currentEmbeddingTest) {
-          renderEmbeddingToCanvasTest(currentEmbeddingTest, 32, 48);
+          // Retrigger test remapping if test embeddings exist
+        if (currentEmbeddingTest1) {
+          renderEmbeddingToCanvasTest1(currentEmbeddingTest1, 32, 48);
+        }
+        if (currentEmbeddingTest2) {
+          renderEmbeddingToCanvasTest2(currentEmbeddingTest2, 32, 48);
         }
       }
 
@@ -475,13 +501,11 @@
         <strong>Click the image to copy CSV data to clipboard.</strong><br>
         <em>Transform: ${transformDescription}</em>
       `;
-    }
-
-    // Test section rendering function
-    function renderEmbeddingToCanvasTest(embedding, width, height) {
-      canvasTest.width = width;
-      canvasTest.height = height;
-      const imageData = ctxTest.createImageData(width, height);
+    }    // Test 1 section rendering function
+    function renderEmbeddingToCanvasTest1(embedding, width, height) {
+      canvasTest1.width = width;
+      canvasTest1.height = height;
+      const imageData = ctxTest1.createImageData(width, height);
       const data = imageData.data;
       const normalizedValues = [];
 
@@ -504,11 +528,50 @@
         data[idx + 2] = b;
         data[idx + 3] = 255;
       }
-      currentNormalizedValuesTest = normalizedValues;
-      ctxTest.putImageData(imageData, 0, 0);
+      currentNormalizedValuesTest1 = normalizedValues;
+      ctxTest1.putImageData(imageData, 0, 0);
       
       // Update transformation description
-      document.getElementById('embeddingInfoTest').innerHTML = `
+      document.getElementById('embeddingInfoTest1').innerHTML = `
+        Each pixel represents one dimension of the embedding vector.<br>
+        Values are exponentially normalized (cube root) from the raw -1 to 1 range to enhance visual contrast.<br>
+        <strong>Click the image to copy CSV data to clipboard.</strong><br>
+        <em>Transform: ${transformDescription}</em>
+      `;
+    }
+
+    // Test 2 section rendering function
+    function renderEmbeddingToCanvasTest2(embedding, width, height) {
+      canvasTest2.width = width;
+      canvasTest2.height = height;
+      const imageData = ctxTest2.createImageData(width, height);
+      const data = imageData.data;
+      const normalizedValues = [];
+
+      // Apply the EXACT SAME reordering indices as the prototype
+      let embeddingToRender = embedding;
+      let transformDescription = "Vector displayed in native order from embedding algorithm.";
+      
+      if (prototypeReorderingIndices && embedding.length === prototypeReorderingIndices.length) {
+        embeddingToRender = reorderTestUsingPrototypeIndices(embedding, prototypeReorderingIndices);
+        transformDescription = "Vector reordered using identical mapping as prototype. Shows semantic differences in basis image structure.";
+      }
+
+      for (let i = 0; i < embeddingToRender.length && i < width * height; i++) {
+        const normalizedValue = mapValueToNormalized(embeddingToRender[i]);
+        normalizedValues.push(normalizedValue);
+        const [r, g, b] = mapValueToGrayscaleRGB(embeddingToRender[i]);
+        const idx = i * 4;
+        data[idx] = r;
+        data[idx + 1] = g;
+        data[idx + 2] = b;
+        data[idx + 3] = 255;
+      }
+      currentNormalizedValuesTest2 = normalizedValues;
+      ctxTest2.putImageData(imageData, 0, 0);
+      
+      // Update transformation description
+      document.getElementById('embeddingInfoTest2').innerHTML = `
         Each pixel represents one dimension of the embedding vector.<br>
         Values are exponentially normalized (cube root) from the raw -1 to 1 range to enhance visual contrast.<br>
         <strong>Click the image to copy CSV data to clipboard.</strong><br>
@@ -561,32 +624,56 @@
           return false;
         }
       }
-    }
-
-    // Event handlers for test section
-    embedButtonTest.addEventListener('click', async () => {
-      const text = textInputTest.value.trim();
-      if (!text) return showStatus(statusTest, 'Please enter some text to embed', 'error');
-      embedButtonTest.disabled = true;
-      showStatus(statusTest, 'Generating embedding...', 'loading');
+    }    // Event handlers for test 1 section
+    embedButtonTest1.addEventListener('click', async () => {
+      const text = textInputTest1.value.trim();
+      if (!text) return showStatus(statusTest1, 'Please enter some text to embed', 'error');
+      embedButtonTest1.disabled = true;
+      showStatus(statusTest1, 'Generating embedding...', 'loading');
       try {
         const embedding = await getEmbedding(text);
-        renderEmbeddingToCanvasTest(embedding, 32, 48);
-        currentEmbeddingTest = embedding;
-        showStatus(statusTest, `Embedding generated successfully! (${embedding.length} dimensions)`, 'success');
+        renderEmbeddingToCanvasTest1(embedding, 32, 48);
+        currentEmbeddingTest1 = embedding;
+        showStatus(statusTest1, `Embedding generated successfully! (${embedding.length} dimensions)`, 'success');
       } catch (error) {
-        showStatus(statusTest, error.message, 'error');
+        showStatus(statusTest1, error.message, 'error');
         console.error('Embedding error:', error);
       } finally {
-        embedButtonTest.disabled = false;
+        embedButtonTest1.disabled = false;
       }
     });
     
-    canvasTest.addEventListener('click', async () => {
-      if (!currentEmbeddingTest) return showStatus(statusTest, 'No embedding data available. Please generate an embedding first.', 'error');
-      const csvData = embeddingToCSV(currentEmbeddingTest);
+    canvasTest1.addEventListener('click', async () => {
+      if (!currentEmbeddingTest1) return showStatus(statusTest1, 'No embedding data available. Please generate an embedding first.', 'error');
+      const csvData = embeddingToCSV(currentEmbeddingTest1);
       const success = await copyToClipboard(csvData);
-      showStatus(statusTest, success ? 'CSV data copied to clipboard!' : 'Failed to copy to clipboard. Please try again.', success ? 'success' : 'error');
+      showStatus(statusTest1, success ? 'CSV data copied to clipboard!' : 'Failed to copy to clipboard. Please try again.', success ? 'success' : 'error');
+    });
+
+    // Event handlers for test 2 section
+    embedButtonTest2.addEventListener('click', async () => {
+      const text = textInputTest2.value.trim();
+      if (!text) return showStatus(statusTest2, 'Please enter some text to embed', 'error');
+      embedButtonTest2.disabled = true;
+      showStatus(statusTest2, 'Generating embedding...', 'loading');
+      try {
+        const embedding = await getEmbedding(text);
+        renderEmbeddingToCanvasTest2(embedding, 32, 48);
+        currentEmbeddingTest2 = embedding;
+        showStatus(statusTest2, `Embedding generated successfully! (${embedding.length} dimensions)`, 'success');
+      } catch (error) {
+        showStatus(statusTest2, error.message, 'error');
+        console.error('Embedding error:', error);
+      } finally {
+        embedButtonTest2.disabled = false;
+      }
+    });
+    
+    canvasTest2.addEventListener('click', async () => {
+      if (!currentEmbeddingTest2) return showStatus(statusTest2, 'No embedding data available. Please generate an embedding first.', 'error');
+      const csvData = embeddingToCSV(currentEmbeddingTest2);
+      const success = await copyToClipboard(csvData);
+      showStatus(statusTest2, success ? 'CSV data copied to clipboard!' : 'Failed to copy to clipboard. Please try again.', success ? 'success' : 'error');
     });
 
     // Canvas click handler for CSV export (prototype)
@@ -743,14 +830,15 @@
           off,
           0, 0, off.width, off.height,
           0, 0, basisCanvas.width, basisCanvas.height
-        );
-
-        // 6) Re-render existing embeddings with basis ordering if they exist
+        );        // 6) Re-render existing embeddings with basis ordering if they exist
         if (currentEmbedding && currentNormalizedValues) {
           renderEmbeddingToCanvas(currentEmbedding, 32, 48);
         }
-        if (currentEmbeddingTest && currentNormalizedValuesTest) {
-          renderEmbeddingToCanvasTest(currentEmbeddingTest, 32, 48);
+        if (currentEmbeddingTest1 && currentNormalizedValuesTest1) {
+          renderEmbeddingToCanvasTest1(currentEmbeddingTest1, 32, 48);
+        }
+        if (currentEmbeddingTest2 && currentNormalizedValuesTest2) {
+          renderEmbeddingToCanvasTest2(currentEmbeddingTest2, 32, 48);
         }
 
         // 7) Expose for downstream embedding code
