@@ -433,10 +433,18 @@
 
       // Apply basis reordering if mapping exists
       let embeddingToRender = embedding;
+      let transformDescription = "Vector displayed in native order from embedding algorithm.";
+      
       if (basisOrderMapping && embedding.length === basisOrderMapping.length) {
         const result = reorderPrototypeByBasis(embedding, basisOrderMapping);
         embeddingToRender = result.reordered;
         prototypeReorderingIndices = result.indices; // Store for test to use
+        transformDescription = "Vector reordered to recreate basis image structure. Lightest embedding values mapped to brightest basis pixels.";
+        
+        // Retrigger test remapping if test embedding exists
+        if (currentEmbeddingTest) {
+          renderEmbeddingToCanvasTest(currentEmbeddingTest, 32, 48);
+        }
       }
 
       for (let i = 0; i < embeddingToRender.length && i < width * height; i++) {
@@ -455,6 +463,14 @@
       currentNormalizedValues = normalizedValues;
 
       ctxProto.putImageData(imageData, 0, 0);
+      
+      // Update transformation description
+      document.getElementById('embeddingInfoProto').innerHTML = `
+        Each pixel represents one dimension of the embedding vector.<br>
+        Brightness corresponds to the value (-1 to 1 range).<br>
+        <strong>Click the image to copy CSV data to clipboard.</strong><br>
+        <em>Transform: ${transformDescription}</em>
+      `;
     }
 
     // Test section rendering function
@@ -467,8 +483,11 @@
 
       // Apply the EXACT SAME reordering indices as the prototype
       let embeddingToRender = embedding;
+      let transformDescription = "Vector displayed in native order from embedding algorithm.";
+      
       if (prototypeReorderingIndices && embedding.length === prototypeReorderingIndices.length) {
         embeddingToRender = reorderTestUsingPrototypeIndices(embedding, prototypeReorderingIndices);
+        transformDescription = "Vector reordered using identical mapping as prototype. Shows semantic differences in basis image structure.";
       }
 
       for (let i = 0; i < embeddingToRender.length && i < width * height; i++) {
@@ -483,6 +502,14 @@
       }
       currentNormalizedValuesTest = normalizedValues;
       ctxTest.putImageData(imageData, 0, 0);
+      
+      // Update transformation description
+      document.getElementById('embeddingInfoTest').innerHTML = `
+        Each pixel represents one dimension of the embedding vector.<br>
+        Brightness corresponds to the value (-1 to 1 range).<br>
+        <strong>Click the image to copy CSV data to clipboard.</strong><br>
+        <em>Transform: ${transformDescription}</em>
+      `;
     }
 
     // CSV export functionality
